@@ -4,7 +4,7 @@ from flask_mysqldb import MySQL
 # initializations
 app = Flask(__name__)
 
-# MySQL connection
+# MySQL connection details
 app.config['MYSQL_HOST'] = '127.0.0.1'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = ''
@@ -41,10 +41,10 @@ def add_contact():
 
 @app.route('/edit/<id>', methods=['POST', 'GET'])
 def get_contact(id):
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT * FROM contacts WHERE id = %s', (id))
-    data = cur.fetchall()
-    cur.close()
+    cursor = mysql.connection.cursor()
+    cursor.execute('SELECT * FROM contacts WHERE id = %s', (id))
+    data = cursor.fetchall()
+    cursor.close()
     print(data[0])
     return render_template('edit-contact.html', contact=data[0])
 
@@ -57,14 +57,7 @@ def update_contact(id):
         email = request.form['email']
         phone = request.form['phone']
         cur = mysql.connection.cursor()
-        cur.execute("""
-            UPDATE contacts
-            SET first_name = %s,
-                last_name = %s,
-                email = %s
-                phone = %s
-            WHERE id = %s
-        """, (first_name, last_name, email, phone, id))
+        cur.execute("UPDATE contacts SET first_name = %s, last_name = %s,email = %s phone = %s WHERE id = %s", (first_name, last_name, email, phone, id))
         flash('Contact Updated Successfully')
         mysql.connection.commit()
         return redirect(url_for('Index'))
